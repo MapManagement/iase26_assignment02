@@ -40,7 +40,7 @@ object JsonLoader {
         }
     ): WorldCupData {
         var lastError: Exception? = null
-        for (url in urls.shuffled()) {
+        for (url in urls) {
             try {
                 return fetcher.fetch(url).use { Json.decodeFromStream(it) }
             } catch (e: Exception) {
