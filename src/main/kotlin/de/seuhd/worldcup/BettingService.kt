@@ -80,14 +80,30 @@ object BettingService {
      *   - 0 points if the predicted outcome is wrong or the match has not been played.
      */
     fun evaluateBonus(matches: List<Match>): Int {
-        TODO("Implement bonus point evaluation")
+        var totalBonus = 0
+        for (match in matches) {
+            val home = match.homeScore ?: continue
+            val away = match.awayScore ?: continue
+            val bet = bets[match.matchId] ?: continue
+
+            if (home == bet.predictedHomeScore && away == bet.predictedAwayScore) {
+                totalBonus += 3
+            }
+            else if (bet.prediction == Prediction.Companion.outcomeOf(home, away)) {
+                totalBonus += 1
+            }
+        }
+
+        return totalBonus
     }
 
     /**
      * Remove the bet for [matchId]. Does nothing if no bet exists for that match.
      */
     fun removeBet(matchId: Int) {
-        TODO("Implement removing a single bet by matchId")
+        if (bets.containsKey(matchId)) {
+            bets.remove(matchId)
+        }
     }
 
     /**
@@ -95,11 +111,17 @@ object BettingService {
      * exists; throws [IllegalArgumentException] if no bet is found for that match.
      */
     fun changeBet(bet: Bet) {
-        TODO("Implement changing an existing bet")
+        if (!bets.containsKey(bet.matchId)) {
+            throw IllegalArgumentException("No bet has been found for that match.")
+        }
+
+        bets[bet.matchId] = bet
+        println(bets[bet.matchId])
     }
 
     /** Drop all stored bets. */
     fun clear() {
         bets.clear()
+        cachedResult = null;
     }
 }
